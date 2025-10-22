@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "640093081957",
+    "project_id": "loginfirebase-a2dfe",
+    "storage_bucket": "loginfirebase-a2dfe.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:640093081957:android:cae6f5eb0433c7ec97d18c",
+        "android_client_info": {
+          "package_name": "co.edu.unab.me.tomasurielesunabstore"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD_srJUvwpPNE_Lcq40qQDx0KjumNH5yWo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

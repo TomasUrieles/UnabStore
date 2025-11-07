@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Card
@@ -43,7 +44,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
-
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import androidx.compose.foundation.shape.RoundedCornerShape
 @Preview
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,6 +71,15 @@ import com.google.firebase.auth.auth
                 isLoading = false
             }
         }
+    fun recargarProductos() {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                productos = productoRepository.obtenerProductos()
+            } catch (e: Exception) {
+                // Manejar error
+            }
+        }
+    }
         Scaffold(
             topBar = {
                 MediumTopAppBar(
@@ -153,7 +166,12 @@ import com.google.firebase.auth.auth
                                     items(productos){ producto ->
                                         ProductoItem(
                                             producto = producto,
-                                            onEliminar = {}
+                                            onEliminar = {
+                                                CoroutineScope(Dispatchers.IO).launch{
+                                                    productoRepository.eliminarProducto(producto.id!!)
+                                                    recargarProductos()
+                                                }
+                                            }
                                         )
                                         Spacer(modifier = Modifier.height(8.dp))
                                     }
@@ -170,9 +188,12 @@ import com.google.firebase.auth.auth
                     onEliminar: () -> Unit
                 ) {
                     Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color.White)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                        shape = RoundedCornerShape(12.dp)
                     ){
                         Row(
                             modifier = Modifier
@@ -188,20 +209,31 @@ import com.google.firebase.auth.auth
                                     text = producto.nombre,
                                     fontSize = 18.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color.Black
+                                    color = Color(0xFF333333)
                                 )
                                 Text(
                                     text = producto.descripcion,
                                     fontSize = 14.sp,
-                                    color = Color.Gray,
-                                    modifier = Modifier.padding(top = 4.dp)
+                                    color = Color(0xFF666666),
+                                    modifier = Modifier.padding(top = 4.dp),
+                                    maxLines = 2
                                 )
                                 Text(
-                                    text = "$${producto.precio}",
+                                    text = "$${"%.2f".format(producto.precio)}",
                                     fontSize = 16.sp,
-                                    fontWeight = FontWeight.Medium,
+                                    fontWeight = FontWeight.Bold,
                                     color = Color(0xFFFF9900),
                                     modifier = Modifier.padding(top = 8.dp)
+                                )
+                            }
+                            IconButton(
+                                onClick = onEliminar,
+                                modifier = Modifier.padding(start = 8.dp)
+                            ){
+                                Icon(
+                                    Icons.Filled.Delete,
+                                    "Eliminar",
+                                    tint = Color.Red
                                 )
                             }
                         }

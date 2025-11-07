@@ -9,50 +9,59 @@ import com.google.firebase.auth.auth
 
 @Composable
 fun NavigationApp() {
-    val navController = rememberNavController()
-
+    val myNavController = rememberNavController()
+    var myStartDestination: String = "login"
     val auth = Firebase.auth
     val currentUser = auth.currentUser
-    val startDestination = if (currentUser != null) "home" else "login"
+
+    if (currentUser != null) {
+        myStartDestination = "home"
+    }else{
+        myStartDestination = "login"
+    }
 
     NavHost(
-        navController = navController,
-        startDestination = startDestination
+        navController = myNavController,
+        startDestination = myStartDestination
     ) {
         composable("login") {
-            LoginScreen(
-                onClickRegister = { navController.navigate("register") },
-                onSuccesfullLogin = {
-                    navController.navigate("home") {
-                        popUpTo(navController.graph.startDestinationId) { inclusive = true }
-                        launchSingleTop = true
-                    }
-                }
-            )
+            LoginScreen(onClickRegister = {
+                myNavController.navigate("register")
+            }, onSuccesfullLogin = {myNavController.navigate("home"){
+                popUpTo("login"){inclusive = true}
+            }
+            })
         }
-
         composable("register") {
-            RegisterScreen(
-                onClickBack = { navController.popBackStack() },
-                onSuccessfulRegister = {
-                    navController.navigate("home") {
-                        popUpTo(navController.graph.startDestinationId) { inclusive = true }
-                        launchSingleTop = true
-                    }
+            RegisterScreen(onClickBack = {
+                myNavController.popBackStack()
+            }, onSuccessfulRegister = {
+                myNavController.navigate("home"){
+                    popUpTo(0)
                 }
-            )
+            })
         }
-
         composable("home") {
-            HomeScreen(
-                onClickLogout = {
-                    // HomeScreen ya hace auth.signOut(); aquí solo navegamos
-                    navController.navigate("login") {
-                        popUpTo(navController.graph.startDestinationId) { inclusive = true }
-                        launchSingleTop = true
-                    }
+            HomeScreen(onClickLogout = {
+                myNavController.navigate("login"){
+                    popUpTo(0)
                 }
-            )
+
+        },
+        onClickAgregarProducto = {
+            myNavController.navigate("agregarProducto")
         }
+        )
     }
+    composable ("agregarProducto"){
+        AgregarProductoScreen (
+            onClickBack = {
+                myNavController.popBackStack()
+            },
+            onProductoAgregado = {
+                myNavController.popBackStack()
+            }
+        )
+    }
+}
 }

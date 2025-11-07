@@ -169,7 +169,12 @@ fun AgregarProductoScreen(
                     // Validaciones básicas
                     nombreError = if (nombre.isEmpty()) "El nombre es requerido" else ""
                     descripcionError = if (descripcion.isEmpty()) "La descripción es requerida" else ""
-                    precioError = if (precio.isEmpty()) "El precio es requerido" else ""
+                    precioError = when{
+                        precio.isEmpty() -> "El precio es requerido"
+                        precio.toDoubleOrNull() == null -> "El precio debe ser un número válido"
+                        precio.toDouble() <= 0 -> "El precio debe ser mayor a 0"
+                        else -> ""
+                    }
 
                     if (nombreError.isEmpty() && descripcionError.isEmpty() && precioError.isEmpty()) {
                         val precioDouble = precio.toDoubleOrNull() ?: 0.0
@@ -189,7 +194,7 @@ fun AgregarProductoScreen(
                                 mensajeExito = "Producto agregado exitosamente"
                                 onProductoAgregado()
                             } catch (e: Exception) {
-                                precioError = "Error al guardar el producto"
+                                precioError = "Error al guardar el producto: ${e.message}"
                             }
                         }
                     }
